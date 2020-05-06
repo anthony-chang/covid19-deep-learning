@@ -3,12 +3,7 @@ import argparse
 import shutil
 import os
 
-# ap = argparse.ArgumentParser()
-# ap.add_argument("-c", "--covid", required=True,
-#                 help="path covid19 dataset")
-# ap.add_argument("-o", "--output", required=True,
-#                 help="path to where images is stored")
-# args = vars(ap.parse_args())
+# build the covid19 positive dataset
 
 df = pd.read_csv("covid-chestxray-dataset\metadata.csv")
 
