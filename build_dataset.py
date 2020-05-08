@@ -14,7 +14,7 @@ for (i, row) in df.iterrows():
     imgpath = os.path.sep.join(["covid-chestxray-dataset\images", row["filename"]])
     
     if not os.path.exists(imgpath):
-        print("error file does not exist")
+        print("error file dne")
         continue
 
     filename = row["filename"].split(os.path.sep)[-1]
