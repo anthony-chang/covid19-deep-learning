@@ -33,11 +33,11 @@ INIT_LR = 1e-3
 EPOCHS = 25
 BS = 8
 
+print("loading images")
 imagepaths = list(paths.list_images("images"))
 data = []
 labels = []
 
-i = 0
 for imgpath in imagepaths:
     label = imgpath.split(os.path.sep)[-2]
 
@@ -48,8 +48,7 @@ for imgpath in imagepaths:
     data.append(img)
     labels.append(label)
 
-data = np.array(data)
-data /= 255.0
+data = np.array(data) / 255.0
 labels = np.array(labels)
 
 lblbin  = LabelBinarizer()
@@ -72,3 +71,21 @@ model = Model(inputs=baseModel.input, outputs=headModel)
 
 for i in baseModel.layers:
     i.trainable = False;
+
+
+print("compiling model")
+opt = Adam(lr=INIT_LR, decay=INIT_LR/EPOCHS)
+model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"])
+
+print("training head")
+H = model.fit_generator(trainAug.flow(trainX, trainY, batch_size=BS),
+                        steps_per_epoch=len(trainX) // BS,
+                        validation_data=(testX, testY),
+                        validation_steps=len(testX)// BS,
+                        epochs=EPOCHS)
+
+print("evaluating model")
+predictInd = model.predict(testX, batch_size=BS)
+predictInd = np.argmax(predictInd, axis=1)
+
+print(classification_report(testY.argmax(axis=1), predictInd, target_names=lblbin.classes_))
