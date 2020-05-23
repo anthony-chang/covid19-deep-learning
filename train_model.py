@@ -19,16 +19,6 @@ import argparse
 import cv2
 import os
 
-
-# ap = argparse.ArgumentParser()
-# ap.add_argument("-d", "--dataset", required=True,
-#                 help="path to input dataset")
-# ap.add_argument("-p", "--plot", type=str, default="plot.png",
-#                 help="path to output loss/accuracy plot")
-# ap.add_argument("-m", "--model", type=str, default="covid19.model",
-#                 help="path to output loss/accuracy plot")
-# args = vars(ap.parse_args())
-
 INIT_LR = 1e-3
 EPOCHS = 25
 BS = 8
@@ -89,3 +79,31 @@ predictInd = model.predict(testX, batch_size=BS)
 predictInd = np.argmax(predictInd, axis=1)
 
 print(classification_report(testY.argmax(axis=1), predictInd, target_names=lblbin.classes_))
+
+conf_mat = confusion_matrix(testY.argmax(axis=1), predictInd)
+total = sum(sum(conf_mat))
+acc = (conf_mat[0, 0] + conf_mat[1, 1]) / total
+sensitivity = conf_mat[0, 0] / (conf_mat[0, 0] + conf_mat[0, 1])
+specificity = conf_mat[1, 1] / (conf_mat[1, 0] + conf_mat[1, 1])
+
+print(conf_mat)
+print("acc: {:f}".format(acc))
+print("sensitivity: {:f}".format(sensitivity))
+print("specificity: {:f}".format(specificity))
+
+
+N = EPOCHS
+plt.style.use("ggplot")
+plt.figure()
+plt.plot(np.arange(0, N), H.history["loss"], label="train_loss")
+plt.plot(np.arange(0, N), H.history["val_loss"], label="val_loss")
+plt.plot(np.arange(0, N), H.history["accuracy"], label="train_acc")
+plt.plot(np.arange(0, N), H.history["val_accuracy"], label="val_acc")
+plt.title("Training Loss/Accuracy")
+plt.xlabel("Epoch")
+plt.ylabel("Loss/Accuracy")
+plt.legend(loc="lower left")
+plt.savefig("plot.png")
+
+print("saving model")
+model.save("covid19.model", save_format="h5")
