@@ -106,4 +106,4 @@ plt.legend(loc="lower left")
 plt.savefig("plot.png")
 
 print("saving model")
-model.save("covid19.model", save_format="h5")
+model.save("covid19_model.h5", save_format="h5")
